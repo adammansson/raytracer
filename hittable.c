@@ -11,6 +11,7 @@ static int sphere_hit(hittable_sphere_t *s, ray_t r, interval_t ival,
 	double d, sqrtd;
 	double root;
 	vec3_t outward_normal;
+	double ia;
 
 	oc = vec3_sub(s->center, r.origin);
 
@@ -21,11 +22,12 @@ static int sphere_hit(hittable_sphere_t *s, ray_t r, interval_t ival,
 	d = h * h - a * c;
 	if (d < 0)
 		return 0;
-	sqrtd = sqrt(d);
 
-	root = (h - sqrtd) / a;
+	sqrtd = sqrt(d);
+	ia = 1.0 / a;
+	root = (h - sqrtd) * ia;
 	if (!interval_surrounds(ival, root)) {
-		root = (h + sqrtd) / a;
+		root = (h + sqrtd) * ia;
 		if (!interval_surrounds(ival, root))
 			return 0;
 	}
@@ -56,7 +58,7 @@ static int list_hit(hittable_list_t *list, ray_t r, interval_t ival,
 	closest_so_far = ival.max;
 	for (i = 0; i < list->length; ++i) {
 		if (hittable_hit(&list->objects[i], r,
-						 interval_new(ival.min, closest_so_far), &temp_rec)) {
+						 (interval_t){ival.min, closest_so_far}, &temp_rec)) {
 			hit_anything = 1;
 			closest_so_far = temp_rec.t;
 			*rec = temp_rec;
@@ -88,6 +90,7 @@ void hittable_list_add(hittable_list_t *list, hittable_t *object)
 		realloc(list->objects, (list->length + 1) * sizeof(hittable_t));
 	list->objects[list->length] = *object;
 	list->length = list->length + 1;
+	// printf("LENGTH IS %lu\n", list->length);
 }
 
 void hittable_list_free(hittable_list_t *list)

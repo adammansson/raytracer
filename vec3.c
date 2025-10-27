@@ -3,17 +3,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-vec3_t vec3_new(double x, double y, double z)
-{
-	vec3_t res;
-
-	res.x = x;
-	res.y = y;
-	res.z = z;
-
-	return res;
-}
-
 vec3_t vec3_random(double min, double max)
 {
 	vec3_t res;
@@ -53,45 +42,10 @@ vec3_t vec3_random_in_unit_disk()
 	vec3_t p;
 
 	for (;;) {
-		p = vec3_new(randomd(-1.0, 1.0), randomd(-1.0, 1.0), 0.0);
+		p = (vec3_t){randomd(-1.0, 1.0), randomd(-1.0, 1.0), 0.0};
 		if (vec3_length_squared(p) < 1.0)
 			return p;
 	}
-}
-
-double vec3_length_squared(vec3_t u)
-{
-	double length_squared;
-
-	length_squared = u.x * u.x + u.y * u.y + u.z * u.z;
-
-	return length_squared;
-}
-
-double vec3_length(vec3_t u) { return sqrt(vec3_length_squared(u)); }
-
-vec3_t vec3_scaled(vec3_t u, double t)
-{
-	vec3_t res;
-
-	res.x = u.x * t;
-	res.y = u.y * t;
-	res.z = u.z * t;
-
-	return res;
-}
-
-vec3_t vec3_normalized(vec3_t u)
-{
-	vec3_t res;
-	double length;
-
-	length = vec3_length(u);
-	res.x = u.x / length;
-	res.y = u.y / length;
-	res.z = u.z / length;
-
-	return res;
 }
 
 vec3_t vec3_reflected(vec3_t u, vec3_t n)
@@ -121,33 +75,6 @@ int vec3_near_zero(vec3_t u)
 	eps = 1e-8;
 
 	return (fabs(u.x) < eps) && (fabs(u.y) < eps) && (fabs(u.z) < eps);
-}
-
-vec3_t vec3_add(vec3_t u, vec3_t v)
-{
-	vec3_t res;
-
-	res.x = u.x + v.x;
-	res.y = u.y + v.y;
-	res.z = u.z + v.z;
-
-	return res;
-}
-
-vec3_t vec3_sub(vec3_t u, vec3_t v)
-{
-	vec3_t res;
-
-	res.x = u.x - v.x;
-	res.y = u.y - v.y;
-	res.z = u.z - v.z;
-
-	return res;
-}
-
-double vec3_dot(vec3_t u, vec3_t v)
-{
-	return u.x * v.x + u.y * v.y + u.z * v.z;
 }
 
 vec3_t vec3_mul(vec3_t u, vec3_t v)

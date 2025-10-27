@@ -18,7 +18,7 @@ static void initialize(camera_t *camera)
 	double defocus_radius;
 
 	camera->aspect_ratio = 16.0 / 9.0;
-	camera->image_width = 1000;
+	camera->image_width = 200;
 	camera->image_height =
 		(int)(((double)camera->image_width) / camera->aspect_ratio);
 	if (camera->image_height < 1)
@@ -28,9 +28,9 @@ static void initialize(camera_t *camera)
 	camera->max_depth = 50;
 
 	camera->vfov = 20.0;
-	camera->lookfrom = vec3_new(13.0, 2.0, 3.0);
-	camera->lookat = vec3_new(0.0, 0.0, 0.0);
-	camera->vup = vec3_new(0.0, 1.0, 0.0);
+	camera->lookfrom = (vec3_t){13.0, 2.0, 3.0};
+	camera->lookat = (vec3_t){0.0, 0.0, 0.0};
+	camera->vup = (vec3_t){0.0, 1.0, 0.0};
 	camera->center = camera->lookfrom;
 
 	camera->defocus_angle = 0.6;
@@ -77,20 +77,20 @@ static vec3_t ray_color(ray_t r, int depth, hittable_t *world)
 	vec3_t attenuation;
 
 	if (depth <= 0)
-		return vec3_new(0.0, 0.0, 0.0);
+		return (vec3_t){0.0, 0.0, 0.0};
 
-	if (hittable_hit(world, r, interval_new(0.001, 1.0 / 0.0), &rec)) {
+	if (hittable_hit(world, r, (interval_t){0.001, 1.0 / 0.0}, &rec)) {
 		if (material_scatter(rec.mat, r, &rec, &attenuation, &scattered))
 			return vec3_mul(attenuation,
 							ray_color(scattered, depth - 1, world));
-		return vec3_new(0.0, 0.0, 0.0);
+		return (vec3_t){0.0, 0.0, 0.0};
 	}
 
 	unit_direction = vec3_normalized(r.direction);
 	a = 0.5 * (unit_direction.y + 1.0);
 
-	res = vec3_add(vec3_scaled(vec3_new(1.0, 1.0, 1.0), 1.0 - a),
-				   vec3_scaled(vec3_new(0.5, 0.7, 1.0), a));
+	res = vec3_add(vec3_scaled((vec3_t){1.0, 1.0, 1.0}, 1.0 - a),
+				   vec3_scaled((vec3_t){0.5, 0.7, 1.0}, a));
 
 	return res;
 }
@@ -103,7 +103,7 @@ static vec3_t sample_square()
 	rx = randomd(0.0, 1.0);
 	ry = randomd(0.0, 1.0);
 
-	return vec3_new(rx, ry, 0.0);
+	return (vec3_t){rx, ry, 0.0};
 }
 
 static vec3_t defocus_disk_sample(camera_t *camera)
@@ -143,10 +143,10 @@ static double linear_to_gamma(double linear_component)
 		return sqrt(linear_component);
 	return 0;
 }
-static void write_color(FILE *stream, vec3_t u)
+static void write_color(FILE *fp, vec3_t u)
 {
 	double r, g, b;
-	int rbyte, gbyte, bbyte;
+	unsigned char rbyte, gbyte, bbyte;
 	interval_t intensity;
 
 	r = u.x;
@@ -157,13 +157,15 @@ static void write_color(FILE *stream, vec3_t u)
 	g = linear_to_gamma(g);
 	b = linear_to_gamma(b);
 
-	intensity = interval_new(0.000, 0.999);
+	intensity = (interval_t){0.000, 0.999};
 
-	rbyte = (int)(256 * interval_clamp(intensity, r));
-	gbyte = (int)(256 * interval_clamp(intensity, g));
-	bbyte = (int)(256 * interval_clamp(intensity, b));
+	rbyte = (unsigned char)(256 * interval_clamp(intensity, r));
+	gbyte = (unsigned char)(256 * interval_clamp(intensity, g));
+	bbyte = (unsigned char)(256 * interval_clamp(intensity, b));
 
-	fprintf(stream, "%i %i %i\n", rbyte, gbyte, bbyte);
+	fwrite(&rbyte, 1, 1, fp);
+	fwrite(&gbyte, 1, 1, fp);
+	fwrite(&bbyte, 1, 1, fp);
 }
 
 void camera_render(camera_t *camera, hittable_t *world)
@@ -173,26 +175,30 @@ void camera_render(camera_t *camera, hittable_t *world)
 	vec3_t pixel_color;
 	int sample;
 	double pixel_samples_scale;
+	FILE *fp;
 
 	initialize(camera);
 
 	pixel_samples_scale = 1.0 / camera->samples_per_pixel;
 
-	fprintf(stdout, "P3\n%i %i\n255\n", camera->image_width,
-			camera->image_height);
+	fp = fopen("image.ppm", "wb");
+	fprintf(fp, "P6\n%i %i\n255\n", camera->image_width, camera->image_height);
+
 	for (j = 0; j < camera->image_height; ++j) {
 		fprintf(stderr, "\rScanlines remaining: %i\n",
 				camera->image_height - j);
 		for (i = 0; i < camera->image_width; ++i) {
-			pixel_color = vec3_new(0.0, 0.0, 0.0);
+			pixel_color = (vec3_t){0.0, 0.0, 0.0};
 			for (sample = 0; sample < camera->samples_per_pixel; ++sample) {
 				r = get_ray(camera, i, j);
 				pixel_color = vec3_add(pixel_color,
 									   ray_color(r, camera->max_depth, world));
 			}
 
-			write_color(stdout, vec3_scaled(pixel_color, pixel_samples_scale));
+			write_color(fp, vec3_scaled(pixel_color, pixel_samples_scale));
 		}
 	}
 	fprintf(stderr, "\rDone.\n");
+
+	fclose(fp);
 }

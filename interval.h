@@ -6,10 +6,25 @@ typedef struct interval {
 	double max;
 } interval_t;
 
-interval_t interval_new(double min, double max);
-double interval_size(interval_t ival);
-int interval_contains(interval_t ival, double x);
-int interval_surrounds(interval_t ival, double x);
-double interval_clamp(interval_t ival, double x);
+static inline double interval_size(interval_t i) { return i.max - i.min; }
+
+static inline int interval_contains(interval_t i, double x)
+{
+	return i.min <= x && x <= i.max;
+}
+
+static inline int interval_surrounds(interval_t i, double x)
+{
+	return i.min < x && x < i.max;
+}
+
+static inline double interval_clamp(interval_t i, double x)
+{
+	if (x < i.min)
+		return i.min;
+	if (x > i.max)
+		return i.max;
+	return x;
+}
 
 #endif

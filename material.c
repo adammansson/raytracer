@@ -76,7 +76,7 @@ static int dielectric_scatter(material_dielectric_t *mat, ray_t r,
 	int cannot_refract;
 	vec3_t direction;
 
-	*attenuation = vec3_new(1.0, 1.0, 1.0);
+	*attenuation = (vec3_t){1.0, 1.0, 1.0};
 	ri = rec->front_face ? 1.0 / mat->refraction_index : mat->refraction_index;
 
 	unit_direction = vec3_normalized(r.direction);
