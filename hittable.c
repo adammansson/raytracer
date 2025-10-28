@@ -7,11 +7,11 @@ static int sphere_hit(hittable_sphere_t *s, ray_t r, interval_t ival,
 					  hit_record_t *rec)
 {
 	vec3_t oc;
-	double a, h, c;
-	double d, sqrtd;
-	double root;
+	float a, h, c;
+	float d, sqd;
+	float root;
 	vec3_t outward_normal;
-	double ia;
+	float ia;
 
 	oc = vec3_sub(s->center, r.origin);
 
@@ -23,11 +23,11 @@ static int sphere_hit(hittable_sphere_t *s, ray_t r, interval_t ival,
 	if (d < 0)
 		return 0;
 
-	sqrtd = sqrt(d);
+	sqd = sqrtf(d);
 	ia = 1.0 / a;
-	root = (h - sqrtd) * ia;
+	root = (h - sqd) * ia;
 	if (!interval_surrounds(ival, root)) {
-		root = (h + sqrtd) * ia;
+		root = (h + sqd) * ia;
 		if (!interval_surrounds(ival, root))
 			return 0;
 	}
@@ -52,7 +52,7 @@ static int list_hit(hittable_list_t *list, ray_t r, interval_t ival,
 	unsigned long i;
 	hit_record_t temp_rec;
 	int hit_anything;
-	double closest_so_far;
+	float closest_so_far;
 
 	hit_anything = 0;
 	closest_so_far = ival.max;
@@ -68,7 +68,7 @@ static int list_hit(hittable_list_t *list, ray_t r, interval_t ival,
 	return hit_anything;
 }
 
-void hittable_sphere_init(hittable_t *h, vec3_t center, double radius,
+void hittable_sphere_init(hittable_t *h, vec3_t center, float radius,
 						  material_t *mat)
 {
 	h->type = HITTABLE_SPHERE;

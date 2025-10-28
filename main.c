@@ -11,10 +11,10 @@ int main()
 	hittable_t s;
 	camera_t camera;
 	int a, b;
-	double choose_mat;
+	float choose_mat;
 	vec3_t center;
 	vec3_t albedo;
-	double fuzz;
+	float fuzz;
 
 	hittable_list_init(&world);
 
@@ -24,9 +24,9 @@ int main()
 
 	for (a = -11; a < 11; ++a) {
 		for (b = -11; b < 11; ++b) {
-			choose_mat = randomd(0.0, 1.0);
-			center = (vec3_t){a + 0.9 * randomd(0.0, 1.0), 0.2,
-							  b + 0.9 * randomd(0.0, 1.0)};
+			choose_mat = randomf(0.0, 1.0);
+			center = (vec3_t){a + 0.9 * randomf(0.0, 1.0), 0.2,
+							  b + 0.9 * randomf(0.0, 1.0)};
 
 			if (vec3_length(vec3_sub(center, (vec3_t){4.0, 0.2, 0.0})) > 0.9) {
 				if (choose_mat < 0.8) {
@@ -35,7 +35,7 @@ int main()
 					material_lambertian_init(&m, albedo);
 				} else if (choose_mat < 0.95) {
 					albedo = vec3_random(0.5, 1.0);
-					fuzz = randomd(0.0, 0.5);
+					fuzz = randomf(0.0, 0.5);
 					material_metal_init(&m, albedo, fuzz);
 				} else {
 					material_dielectric_init(&m, 1.5);

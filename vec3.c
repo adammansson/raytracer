@@ -3,13 +3,13 @@
 #include <math.h>
 #include <stdlib.h>
 
-vec3_t vec3_random(double min, double max)
+vec3_t vec3_random(float min, float max)
 {
 	vec3_t res;
 
-	res.x = randomd(min, max);
-	res.y = randomd(min, max);
-	res.z = randomd(min, max);
+	res.x = randomf(min, max);
+	res.y = randomf(min, max);
+	res.z = randomf(min, max);
 
 	return res;
 }
@@ -17,7 +17,7 @@ vec3_t vec3_random(double min, double max)
 vec3_t vec3_random_unit_vector()
 {
 	vec3_t p;
-	double lensq;
+	float lensq;
 
 	for (;;) {
 		p = vec3_random(-1.0, 1.0);
@@ -42,7 +42,7 @@ vec3_t vec3_random_in_unit_disk()
 	vec3_t p;
 
 	for (;;) {
-		p = (vec3_t){randomd(-1.0, 1.0), randomd(-1.0, 1.0), 0.0};
+		p = (vec3_t){randomf(-1.0, 1.0), randomf(-1.0, 1.0), 0.0};
 		if (vec3_length_squared(p) < 1.0)
 			return p;
 	}
@@ -53,9 +53,9 @@ vec3_t vec3_reflected(vec3_t u, vec3_t n)
 	return vec3_sub(u, vec3_scaled(n, 2 * vec3_dot(u, n)));
 }
 
-vec3_t vec3_refracted(vec3_t u, vec3_t n, double etai_over_etat)
+vec3_t vec3_refracted(vec3_t u, vec3_t n, float etai_over_etat)
 {
-	double cos_theta;
+	float cos_theta;
 	vec3_t r_out_perp;
 	vec3_t r_out_parallel;
 
@@ -70,7 +70,7 @@ vec3_t vec3_refracted(vec3_t u, vec3_t n, double etai_over_etat)
 
 int vec3_near_zero(vec3_t u)
 {
-	double eps;
+	float eps;
 
 	eps = 1e-8;
 

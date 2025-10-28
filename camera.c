@@ -7,24 +7,24 @@
 
 static void initialize(camera_t *camera)
 {
-	double theta;
-	double h;
-	double viewport_height;
-	double viewport_width;
+	float theta;
+	float h;
+	float viewport_height;
+	float viewport_width;
 	vec3_t viewport_u;
 	vec3_t viewport_v;
 	vec3_t viewport_ul;
 	vec3_t u, v, w;
-	double defocus_radius;
+	float defocus_radius;
 
 	camera->aspect_ratio = 16.0 / 9.0;
-	camera->image_width = 200;
+	camera->image_width = 800;
 	camera->image_height =
-		(int)(((double)camera->image_width) / camera->aspect_ratio);
+		(int)(((float)camera->image_width) / camera->aspect_ratio);
 	if (camera->image_height < 1)
 		camera->image_height = 1;
 
-	camera->samples_per_pixel = 10;
+	camera->samples_per_pixel = 100;
 	camera->max_depth = 50;
 
 	camera->vfov = 20.0;
@@ -39,8 +39,8 @@ static void initialize(camera_t *camera)
 	theta = degrees_to_radians(camera->vfov);
 	h = tan(theta / 2.0);
 	viewport_height = 2 * h * camera->focus_dist;
-	viewport_width = viewport_height *
-					 (((double)camera->image_width) / camera->image_height);
+	viewport_width =
+		viewport_height * (((float)camera->image_width) / camera->image_height);
 
 	w = vec3_normalized(vec3_sub(camera->lookfrom, camera->lookat));
 	u = vec3_normalized(vec3_cross(camera->vup, w));
@@ -71,7 +71,7 @@ static vec3_t ray_color(ray_t r, int depth, hittable_t *world)
 {
 	vec3_t res;
 	vec3_t unit_direction;
-	double a;
+	float a;
 	hit_record_t rec;
 	ray_t scattered;
 	vec3_t attenuation;
@@ -98,10 +98,10 @@ static vec3_t ray_color(ray_t r, int depth, hittable_t *world)
 static vec3_t sample_square()
 {
 
-	double rx, ry;
+	float rx, ry;
 
-	rx = randomd(0.0, 1.0);
-	ry = randomd(0.0, 1.0);
+	rx = randomf(0.0, 1.0);
+	ry = randomf(0.0, 1.0);
 
 	return (vec3_t){rx, ry, 0.0};
 }
@@ -134,18 +134,18 @@ static ray_t get_ray(camera_t *camera, int i, int j)
 											  : defocus_disk_sample(camera);
 	ray_direction = vec3_sub(pixel_sample, ray_origin);
 
-	return ray_new(ray_origin, ray_direction);
+	return (ray_t){ray_origin, ray_direction};
 }
 
-static double linear_to_gamma(double linear_component)
+static float linear_to_gamma(float linear_component)
 {
 	if (linear_component > 0.0)
-		return sqrt(linear_component);
+		return sqrtf(linear_component);
 	return 0;
 }
 static void write_color(FILE *fp, vec3_t u)
 {
-	double r, g, b;
+	float r, g, b;
 	unsigned char rbyte, gbyte, bbyte;
 	interval_t intensity;
 
@@ -174,7 +174,7 @@ void camera_render(camera_t *camera, hittable_t *world)
 	ray_t r;
 	vec3_t pixel_color;
 	int sample;
-	double pixel_samples_scale;
+	float pixel_samples_scale;
 	FILE *fp;
 
 	initialize(camera);
@@ -182,6 +182,10 @@ void camera_render(camera_t *camera, hittable_t *world)
 	pixel_samples_scale = 1.0 / camera->samples_per_pixel;
 
 	fp = fopen("image.ppm", "wb");
+	if (fp == NULL) {
+		perror("fopen");
+		exit(EXIT_FAILURE);
+	}
 	fprintf(fp, "P6\n%i %i\n255\n", camera->image_width, camera->image_height);
 
 	for (j = 0; j < camera->image_height; ++j) {

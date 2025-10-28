@@ -1,8 +1,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "vec3.h"
 #include "ray.h"
+#include "vec3.h"
 
 typedef struct hit_record hit_record_t;
 
@@ -18,11 +18,11 @@ typedef struct material_lambertian {
 
 typedef struct material_metal {
 	vec3_t albedo;
-	double fuzz;
+	float fuzz;
 } material_metal_t;
 
 typedef struct material_dielectric {
-	double refraction_index;
+	float refraction_index;
 } material_dielectric_t;
 
 typedef struct material {
@@ -35,9 +35,10 @@ typedef struct material {
 } material_t;
 
 void material_lambertian_init(material_t *mat, vec3_t albedo);
-void material_metal_init(material_t *mat, vec3_t albedo, double fuzz);
-void material_dielectric_init(material_t *mat, double refraction_index);
+void material_metal_init(material_t *mat, vec3_t albedo, float fuzz);
+void material_dielectric_init(material_t *mat, float refraction_index);
 
-int material_scatter(material_t *mat, ray_t r, hit_record_t *rec, vec3_t *attenuation, ray_t *scattered);
+int material_scatter(material_t *mat, ray_t r, hit_record_t *rec,
+					 vec3_t *attenuation, ray_t *scattered);
 
 #endif

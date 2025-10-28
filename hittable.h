@@ -1,15 +1,15 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "ray.h"
 #include "interval.h"
 #include "material.h"
+#include "ray.h"
 
 typedef struct hit_record {
 	vec3_t p;
 	vec3_t normal;
 	material_t *mat;
-	double t;
+	float t;
 	int front_face;
 } hit_record_t;
 
@@ -22,7 +22,7 @@ typedef enum hittable_type {
 
 typedef struct hittable_sphere {
 	vec3_t center;
-	double radius;
+	float radius;
 	material_t mat;
 } hittable_sphere_t;
 
@@ -39,7 +39,8 @@ typedef struct hittable {
 	};
 } hittable_t;
 
-void hittable_sphere_init(hittable_t *h, vec3_t center, double radius, material_t *mat);
+void hittable_sphere_init(hittable_t *h, vec3_t center, float radius,
+						  material_t *mat);
 void hittable_list_init(hittable_t *h);
 void hittable_list_add(hittable_list_t *list, hittable_t *object);
 void hittable_list_free(hittable_list_t *list);

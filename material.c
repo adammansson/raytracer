@@ -10,7 +10,7 @@ void material_lambertian_init(material_t *mat, vec3_t albedo)
 	mat->lambertian.albedo = albedo;
 }
 
-void material_metal_init(material_t *mat, vec3_t albedo, double fuzz)
+void material_metal_init(material_t *mat, vec3_t albedo, float fuzz)
 {
 	mat->type = MATERIAL_METAL;
 	mat->metal.albedo = albedo;
@@ -20,7 +20,7 @@ void material_metal_init(material_t *mat, vec3_t albedo, double fuzz)
 		mat->metal.fuzz = fuzz;
 }
 
-void material_dielectric_init(material_t *mat, double refraction_index)
+void material_dielectric_init(material_t *mat, float refraction_index)
 {
 	mat->type = MATERIAL_DIELECTRIC;
 	mat->dielectric.refraction_index = refraction_index;
@@ -35,7 +35,7 @@ static int lambertian_scatter(material_lambertian_t *mat, hit_record_t *rec,
 	if (vec3_near_zero(scatter_direction))
 		scatter_direction = rec->normal;
 
-	*scattered = ray_new(rec->p, scatter_direction);
+	*scattered = (ray_t){rec->p, scatter_direction};
 	*attenuation = mat->albedo;
 
 	return 1;
@@ -49,15 +49,15 @@ static int metal_scatter(material_metal_t *mat, ray_t r, hit_record_t *rec,
 	reflected = vec3_reflected(r.direction, rec->normal);
 	reflected = vec3_add(vec3_normalized(reflected),
 						 vec3_scaled(vec3_random_unit_vector(), mat->fuzz));
-	*scattered = ray_new(rec->p, reflected);
+	*scattered = (ray_t){rec->p, reflected};
 	*attenuation = mat->albedo;
 
 	return vec3_dot(scattered->direction, rec->normal) > 0;
 }
 
-static double reflectance(double cosine, double refraction_index)
+static float reflectance(float cosine, float refraction_index)
 {
-	double r0;
+	float r0;
 
 	r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
 	r0 = r0 * r0;
@@ -69,10 +69,10 @@ static int dielectric_scatter(material_dielectric_t *mat, ray_t r,
 							  hit_record_t *rec, vec3_t *attenuation,
 							  ray_t *scattered)
 {
-	double ri;
+	float ri;
 	vec3_t unit_direction;
-	double cos_theta;
-	double sin_theta;
+	float cos_theta;
+	float sin_theta;
 	int cannot_refract;
 	vec3_t direction;
 
@@ -82,15 +82,15 @@ static int dielectric_scatter(material_dielectric_t *mat, ray_t r,
 	unit_direction = vec3_normalized(r.direction);
 	cos_theta =
 		fmin(vec3_dot(vec3_scaled(unit_direction, -1.0), rec->normal), 1.0);
-	sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+	sin_theta = sqrtf(1.0 - cos_theta * cos_theta);
 
 	cannot_refract = ri * sin_theta > 1.0;
-	if (cannot_refract || reflectance(cos_theta, ri) > randomd(0.0, 1.0))
+	if (cannot_refract || reflectance(cos_theta, ri) > randomf(0.0, 1.0))
 		direction = vec3_reflected(unit_direction, rec->normal);
 	else
 		direction = vec3_refracted(unit_direction, rec->normal, ri);
 
-	*scattered = ray_new(rec->p, direction);
+	*scattered = (ray_t){rec->p, direction};
 
 	return 1;
 }

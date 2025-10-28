@@ -8,8 +8,9 @@ typedef struct ray {
 	vec3_t direction;
 } ray_t;
 
-ray_t ray_new(vec3_t origin, vec3_t direction);
-
-vec3_t ray_at(ray_t r, double t);
+static inline vec3_t ray_at(ray_t r, float t)
+{
+	return vec3_add(r.origin, vec3_scaled(r.direction, t));
+}
 
 #endif
