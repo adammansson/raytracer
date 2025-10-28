@@ -6,7 +6,10 @@ typedef struct interval {
 	float max;
 } interval_t;
 
-static inline float interval_size(interval_t i) { return i.max - i.min; }
+static inline float interval_size(interval_t i)
+{
+	return i.max - i.min;
+}
 
 static inline int interval_contains(interval_t i, float x)
 {

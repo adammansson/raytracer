@@ -25,13 +25,11 @@ int main()
 	for (a = -11; a < 11; ++a) {
 		for (b = -11; b < 11; ++b) {
 			choose_mat = randomf(0.0, 1.0);
-			center = (vec3_t){a + 0.9 * randomf(0.0, 1.0), 0.2,
-							  b + 0.9 * randomf(0.0, 1.0)};
+			center = (vec3_t){a + 0.9 * randomf(0.0, 1.0), 0.2, b + 0.9 * randomf(0.0, 1.0)};
 
 			if (vec3_length(vec3_sub(center, (vec3_t){4.0, 0.2, 0.0})) > 0.9) {
 				if (choose_mat < 0.8) {
-					albedo =
-						vec3_mul(vec3_random(0.0, 1.0), vec3_random(0.0, 1.0));
+					albedo = vec3_mul(vec3_random(0.0, 1.0), vec3_random(0.0, 1.0));
 					material_lambertian_init(&m, albedo);
 				} else if (choose_mat < 0.95) {
 					albedo = vec3_random(0.5, 1.0);

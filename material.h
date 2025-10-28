@@ -38,7 +38,6 @@ void material_lambertian_init(material_t *mat, vec3_t albedo);
 void material_metal_init(material_t *mat, vec3_t albedo, float fuzz);
 void material_dielectric_init(material_t *mat, float refraction_index);
 
-int material_scatter(material_t *mat, ray_t r, hit_record_t *rec,
-					 vec3_t *attenuation, ray_t *scattered);
+int material_scatter(material_t *mat, ray_t r, hit_record_t *rec, vec3_t *attenuation, ray_t *scattered);
 
 #endif

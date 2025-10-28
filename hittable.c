@@ -3,8 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-static int sphere_hit(hittable_sphere_t *s, ray_t r, interval_t ival,
-					  hit_record_t *rec)
+static int sphere_hit(hittable_sphere_t *s, ray_t r, interval_t ival, hit_record_t *rec)
 {
 	vec3_t oc;
 	float a, h, c;
@@ -46,8 +45,7 @@ static int sphere_hit(hittable_sphere_t *s, ray_t r, interval_t ival,
 	return 1;
 }
 
-static int list_hit(hittable_list_t *list, ray_t r, interval_t ival,
-					hit_record_t *rec)
+static int list_hit(hittable_list_t *list, ray_t r, interval_t ival, hit_record_t *rec)
 {
 	unsigned long i;
 	hit_record_t temp_rec;
@@ -57,8 +55,7 @@ static int list_hit(hittable_list_t *list, ray_t r, interval_t ival,
 	hit_anything = 0;
 	closest_so_far = ival.max;
 	for (i = 0; i < list->length; ++i) {
-		if (hittable_hit(&list->objects[i], r,
-						 (interval_t){ival.min, closest_so_far}, &temp_rec)) {
+		if (hittable_hit(&list->objects[i], r, (interval_t){ival.min, closest_so_far}, &temp_rec)) {
 			hit_anything = 1;
 			closest_so_far = temp_rec.t;
 			*rec = temp_rec;
@@ -68,8 +65,7 @@ static int list_hit(hittable_list_t *list, ray_t r, interval_t ival,
 	return hit_anything;
 }
 
-void hittable_sphere_init(hittable_t *h, vec3_t center, float radius,
-						  material_t *mat)
+void hittable_sphere_init(hittable_t *h, vec3_t center, float radius, material_t *mat)
 {
 	h->type = HITTABLE_SPHERE;
 	h->sphere.center = center;
@@ -86,8 +82,7 @@ void hittable_list_init(hittable_t *h)
 
 void hittable_list_add(hittable_list_t *list, hittable_t *object)
 {
-	list->objects =
-		realloc(list->objects, (list->length + 1) * sizeof(hittable_t));
+	list->objects = realloc(list->objects, (list->length + 1) * sizeof(hittable_t));
 	list->objects[list->length] = *object;
 	list->length = list->length + 1;
 	// printf("LENGTH IS %lu\n", list->length);

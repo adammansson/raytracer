@@ -26,8 +26,7 @@ void material_dielectric_init(material_t *mat, float refraction_index)
 	mat->dielectric.refraction_index = refraction_index;
 }
 
-static int lambertian_scatter(material_lambertian_t *mat, hit_record_t *rec,
-							  vec3_t *attenuation, ray_t *scattered)
+static int lambertian_scatter(material_lambertian_t *mat, hit_record_t *rec, vec3_t *attenuation, ray_t *scattered)
 {
 	vec3_t scatter_direction;
 
@@ -41,14 +40,12 @@ static int lambertian_scatter(material_lambertian_t *mat, hit_record_t *rec,
 	return 1;
 }
 
-static int metal_scatter(material_metal_t *mat, ray_t r, hit_record_t *rec,
-						 vec3_t *attenuation, ray_t *scattered)
+static int metal_scatter(material_metal_t *mat, ray_t r, hit_record_t *rec, vec3_t *attenuation, ray_t *scattered)
 {
 	vec3_t reflected;
 
 	reflected = vec3_reflected(r.direction, rec->normal);
-	reflected = vec3_add(vec3_normalized(reflected),
-						 vec3_scaled(vec3_random_unit_vector(), mat->fuzz));
+	reflected = vec3_add(vec3_normalized(reflected), vec3_scaled(vec3_random_unit_vector(), mat->fuzz));
 	*scattered = (ray_t){rec->p, reflected};
 	*attenuation = mat->albedo;
 
@@ -65,9 +62,7 @@ static float reflectance(float cosine, float refraction_index)
 	return r0 + (1 - r0) * pow(1.0 - cosine, 5);
 }
 
-static int dielectric_scatter(material_dielectric_t *mat, ray_t r,
-							  hit_record_t *rec, vec3_t *attenuation,
-							  ray_t *scattered)
+static int dielectric_scatter(material_dielectric_t *mat, ray_t r, hit_record_t *rec, vec3_t *attenuation, ray_t *scattered)
 {
 	float ri;
 	vec3_t unit_direction;
@@ -80,8 +75,7 @@ static int dielectric_scatter(material_dielectric_t *mat, ray_t r,
 	ri = rec->front_face ? 1.0 / mat->refraction_index : mat->refraction_index;
 
 	unit_direction = vec3_normalized(r.direction);
-	cos_theta =
-		fmin(vec3_dot(vec3_scaled(unit_direction, -1.0), rec->normal), 1.0);
+	cos_theta = fmin(vec3_dot(vec3_scaled(unit_direction, -1.0), rec->normal), 1.0);
 	sin_theta = sqrtf(1.0 - cos_theta * cos_theta);
 
 	cannot_refract = ri * sin_theta > 1.0;
@@ -95,18 +89,15 @@ static int dielectric_scatter(material_dielectric_t *mat, ray_t r,
 	return 1;
 }
 
-int material_scatter(material_t *mat, ray_t r, hit_record_t *rec,
-					 vec3_t *attenuation, ray_t *scattered)
+int material_scatter(material_t *mat, ray_t r, hit_record_t *rec, vec3_t *attenuation, ray_t *scattered)
 {
 	switch (mat->type) {
 	case MATERIAL_LAMBERTIAN:
-		return lambertian_scatter(&mat->lambertian, rec, attenuation,
-								  scattered);
+		return lambertian_scatter(&mat->lambertian, rec, attenuation, scattered);
 	case MATERIAL_METAL:
 		return metal_scatter(&mat->metal, r, rec, attenuation, scattered);
 	case MATERIAL_DIELECTRIC:
-		return dielectric_scatter(&mat->dielectric, r, rec, attenuation,
-								  scattered);
+		return dielectric_scatter(&mat->dielectric, r, rec, attenuation, scattered);
 	default:
 		assert(0 && "unknown material");
 	}

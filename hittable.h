@@ -39,8 +39,7 @@ typedef struct hittable {
 	};
 } hittable_t;
 
-void hittable_sphere_init(hittable_t *h, vec3_t center, float radius,
-						  material_t *mat);
+void hittable_sphere_init(hittable_t *h, vec3_t center, float radius, material_t *mat);
 void hittable_list_init(hittable_t *h);
 void hittable_list_add(hittable_list_t *list, hittable_t *object);
 void hittable_list_free(hittable_list_t *list);
