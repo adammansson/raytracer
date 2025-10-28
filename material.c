@@ -62,7 +62,8 @@ static float reflectance(float cosine, float refraction_index)
 	return r0 + (1 - r0) * pow(1.0 - cosine, 5);
 }
 
-static int dielectric_scatter(material_dielectric_t *mat, ray_t r, hit_record_t *rec, vec3_t *attenuation, ray_t *scattered)
+static int dielectric_scatter(material_dielectric_t *mat, ray_t r, hit_record_t *rec, vec3_t *attenuation,
+							  ray_t *scattered)
 {
 	float ri;
 	vec3_t unit_direction;

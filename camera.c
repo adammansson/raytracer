@@ -18,12 +18,12 @@ static void initialize(camera_t *camera)
 	float defocus_radius;
 
 	camera->aspect_ratio = 16.0 / 9.0;
-	camera->image_width = 800;
+	camera->image_width = 1600;
 	camera->image_height = (int)(((float)camera->image_width) / camera->aspect_ratio);
 	if (camera->image_height < 1)
 		camera->image_height = 1;
 
-	camera->samples_per_pixel = 20;
+	camera->samples_per_pixel = 100;
 	camera->max_depth = 50;
 
 	camera->vfov = 20.0;
@@ -191,7 +191,7 @@ void camera_render(camera_t *camera, hittable_t *world)
 		exit(EXIT_FAILURE);
 	}
 
-	// #pragma omp parallel for collapse(2) private(i, j, offset)
+#pragma omp parallel for collapse(2) private(i, j, offset)
 	for (j = 0; j < camera->image_height; ++j) {
 		for (i = 0; i < camera->image_width; ++i) {
 			offset = 3 * (i + j * camera->image_width);
